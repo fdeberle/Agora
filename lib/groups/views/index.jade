@@ -28,10 +28,8 @@ block content
         div#chart-div(style="width: 900px; height: 500px;")
           | Hier kommt das Chart hin
 
-    .col-md-6
-      mixin grouplist('Regionalgruppen', regionalgroups)
-
-      mixin grouplist('Themengruppen', themegroups)
+    mixin grouplist('Regionalgruppen', regionalgroups)
+    mixin grouplist('Themengruppen', themegroups)
       
   script(src="https://www.google.com/jsapi")
   script
