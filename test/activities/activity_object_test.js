@@ -87,6 +87,50 @@ describe('Activity', function () {
     expect('#353535').to.equal(color);
     done();
   });
+
+  it('adjusts a wrong end date', function (done) {
+    var activity = new Activity({
+      url: 'myURL',
+      startUnix: 22,
+      endUnix: 21
+    });
+    var wasAdjusted = activity.adjustEndDate();
+    expect(activity.endUnix).to.equal(activity.startUnix);
+    expect(wasAdjusted).to.be.true;
+    done();
+  });
+
+  it('does not adjust a correct end date', function (done) {
+    var activity = new Activity({
+      url: 'myURL',
+      startUnix: 22,
+      endUnix: 24
+    });
+    var wasAdjusted = activity.adjustEndDate();
+    expect(activity.endUnix).to.equal(24);
+    expect(wasAdjusted).to.be.false;
+    done();
+  });
+});
+
+describe('Activity\'s description', function () {
+  it('renders anchor tags when required', function (done) {
+    var activity = new Activity();
+    activity.description = '<a href = "http://a.de">dafadf</a> https://b.de';
+    expect(activity.descriptionHTML()).to.contain('"http://a.de"');
+    expect(activity.descriptionHTML()).to.contain('"https://b.de"');
+    done();
+  });
+
+  it('removes anchor tags when required', function (done) {
+    var activity = new Activity();
+    activity.description = '<a href = "http://a.de">dafadf</a> https://b.de';
+    expect(activity.descriptionHTMLWithoutAnchors()).to.not.contain('"http://a.de"');
+    expect(activity.descriptionHTMLWithoutAnchors()).to.not.contain('"https://b.de"');
+    expect(activity.descriptionHTMLWithoutAnchors()).to.not.contain('dafadf');
+    expect(activity.descriptionHTMLWithoutAnchors()).to.not.contain('https://b.de');
+    done();
+  });
 });
 
 describe('Activity stores a list of members', function () {
@@ -128,6 +172,24 @@ describe('Activity stores a list of members', function () {
     var activity = new Activity();
     activity.removeMemberId('notRegisteredID');
     expect(activity.registeredMembers).to.be.empty;
+    done();
+  });
+
+  it('resets for copied activity', function (done) {
+    var activity = new Activity({
+      id: 'ID',
+      title: 'Title',
+      startDate: '4.4.2013',
+      endDate: '5.4.2013',
+      url: 'myURL',
+      registeredMembers: ['memberID']
+    });
+    activity = activity.resetForClone();
+    expect(activity.registeredMembers).to.be.empty;
+    expect(activity.startDate()).to.not.equal('04.04.2013');
+    expect(activity.endDate()).to.not.equal('05.04.2013');
+    expect(activity.id).to.be.null;
+    expect(activity.url).to.be.null;
     done();
   });
 
